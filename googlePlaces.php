@@ -108,11 +108,11 @@ class googlePlaces
 			$this->_errors[] = "API Call Type is required but is missing.";
 		}
 
-		if(empty($this->APIKey)) {
+		if(empty($this->_apiKey)) {
 			$this->_errors[] = "API Key is is required but is missing.";
 		}
 
-		if(($this->OutputType!="json") && ($this->OutputType!="xml") && ($this->OutputType!="json")) {
+		if(($this->_outputType!="json") && ($this->outputType!="xml") && ($this->outputType!="json")) {
 			$this->_errors[] = "OutputType is required but is missing.";
 		}
 	}
@@ -162,7 +162,7 @@ class googlePlaces
 	
 		$URLToCall = $this->_apiUrl."/".$this->_apiCallType."/".$this->_outputType."?key=".$this->_apiKey."&".$URLparams;
 		$result = json_decode(file_get_contents($URLToCall),true);
-		$result['errors'] = $this->Errors;
+		$result['errors'] = $this->_errors;
 	
 		if($result[status]=="OK" && $this->_apiCallType=="details") {
 			foreach($result[result][address_components] as $key=>$component) {
