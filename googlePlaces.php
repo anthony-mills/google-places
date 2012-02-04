@@ -165,7 +165,7 @@ class googlePlaces
 		$result['errors'] = $this->_errors;
 	
 		if($result['status']=="OK" && $this->_apiCallType=="details") {
-			foreach($result['result'][address_components] as $key=>$component) {
+			foreach($result['result']['address_components'] as $key=>$component) {
 	
 				if($component['types'][0]=="street_number") {
 					$address_street_number = $component['short_name'];
