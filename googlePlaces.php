@@ -161,7 +161,8 @@ class googlePlaces
 		}
 	
 		$URLToCall = $this->_apiUrl."/".$this->_apiCallType."/".$this->_outputType."?key=".$this->_apiKey."&".$URLparams;
-		$result = json_decode(file_get_contents($URLToCall),true);
+		$result = json_decode($this->_curlCall($URLToCall));
+		$result = $this->_objectToArray($result);
 		$result['errors'] = $this->_errors;
 	
 		if($result['status']=="OK" && $this->_apiCallType=="details") {
@@ -198,17 +199,32 @@ class googlePlaces
 		return $result;
 	}
 
-	protected function _curlCall($url,$topost)
+	protected function _curlCall($url,$topost = array())
 	{
 		$ch = curl_init();
 		echo ($topost);
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HEADER, FALSE);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $topost);
+		if (!empty($topost)) {
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $topost);
+		}
 		$body = curl_exec($ch);
 		curl_close($ch);
 
 		return $body;
+	}
+	
+	protected function _objectToArray($d) 
+	{
+		if (is_object($d)) {
+			$d = get_object_vars($d);
+		}
+
+		if (is_array($d)) {
+			return array_map(array($this, __FUNCTION__), $d);
+		} else {
+			return $d;
+		}
 	}
 }
