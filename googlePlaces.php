@@ -202,7 +202,6 @@ class googlePlaces
 	protected function _curlCall($url,$topost = array())
 	{
 		$ch = curl_init();
-		echo ($topost);
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HEADER, FALSE);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
