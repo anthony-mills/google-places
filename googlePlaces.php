@@ -161,8 +161,7 @@ class googlePlaces
 		}
 	
 		$URLToCall = $this->_apiUrl."/".$this->_apiCallType."/".$this->_outputType."?key=".$this->_apiKey."&".$URLparams;
-		$result = json_decode($this->_curlCall($URLToCall));
-		$result = $this->_objectToArray($result);
+		$result = json_decode($this->_curlCall($URLToCall), true);
 		$result['errors'] = $this->_errors;
 	
 		if($result['status']=="OK" && $this->_apiCallType=="details") {
@@ -212,18 +211,5 @@ class googlePlaces
 		curl_close($ch);
 
 		return $body;
-	}
-	
-	protected function _objectToArray($d) 
-	{
-		if (is_object($d)) {
-			$d = get_object_vars($d);
-		}
-
-		if (is_array($d)) {
-			return array_map(array($this, __FUNCTION__), $d);
-		} else {
-			return $d;
-		}
 	}
 }
