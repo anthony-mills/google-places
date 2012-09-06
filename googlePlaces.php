@@ -1,19 +1,19 @@
 <?php
 class googlePlaces
 {
-	public $_outputType = "json"; //either json, xml or array
+	public $_outputType = 'json'; //either json, xml or array
 	public $_errors = array();
 		
 	protected $_apiKey = '';
-	protected $_apiUrl = "https://maps.googleapis.com/maps/api/place";
+	protected $_apiUrl = 'https://maps.googleapis.com/maps/api/place';
 	protected $_apiCallType = '';
 	protected $_includeDetails = false;
 	protected $_language = 'en';
 	protected $_location; // Required - This must be provided as a google.maps.LatLng object.
 	protected $_radius; // Required
-	protected $_types; // Optional - separate tyep with pipe symbol http://code.google.com/apis/maps/documentation/places/supported_types.html
+	protected $_types; // Optional - separate type with pipe symbol http://code.google.com/apis/maps/documentation/places/supported_types.html
 	protected $_name; // Optional
-	protected $_sensor = 'false'; // Required - is $Location coming from a sensor? like GPS?
+	protected $_sensor = 'false'; // Required simply True or False, is the provided $_location coming from GPS?
 	protected $_reference;
 	protected $_accuracy;
 	
@@ -24,35 +24,35 @@ class googlePlaces
 
 	public function search()
 	{
-		$this->_apiCallType = "search";
+		$this->_apiCallType = 'search';
 
 		return $this->_apiCall();
 	}
 
 	public function details()
 	{
-		$this->_apiCallType = "details";
+		$this->_apiCallType = 'details';
 		
 		return $this->_apiCall();
 	}
 
 	public function checkIn()
 	{
-		$this->_apiCallType = "checkin-in";
+		$this->_apiCallType = 'checkin-in';
 
 		return $this->_apiCall();
 	}
 
 	public function add()
 	{
-		$this->_apiCallType = "add";
+		$this->_apiCallType = 'add';
 
 		return $this->_apiCall();
 	}
 
 	public function delete()
 	{
-		$this->_apiCallType = "delete";
+		$this->_apiCallType = 'delete';
 
 		return $this->_apiCall();
 	}
@@ -105,15 +105,15 @@ class googlePlaces
 	protected function _checkErrors()
 	{
 		if(empty($this->_apiCallType)) {
-			$this->_errors[] = "API Call Type is required but is missing.";
+			$this->_errors[] = 'API Call Type is required but is missing.';
 		}
 
 		if(empty($this->_apiKey)) {
-			$this->_errors[] = "API Key is is required but is missing.";
+			$this->_errors[] = 'API Key is is required but is missing.';
 		}
 
-		if(($this->_outputType!="json") && ($this->outputType!="xml") && ($this->outputType!="json")) {
-			$this->_errors[] = "OutputType is required but is missing.";
+		if(($this->_outputType!='json') && ($this->outputType!='xml') && ($this->outputType!='json')) {
+			$this->_errors[] = 'OutputType is required but is missing.';
 		}
 	}
 
@@ -121,11 +121,11 @@ class googlePlaces
 	{
 		$this->_checkErrors();
 
-		if($this->_apiCallType=="add" || $this->_apiCallType=="delete") {
-			$postUrl = $this->_apiUrl."/".$this->_apiCallType."/".$this->_outputType."?key=".$this->_apiKey."&sensor=".$this->_sensor;
+		if($this->_apiCallType=='add' || $this->_apiCallType=='delete') {
+			$postUrl = $this->_apiUrl . '/' . $this->_apiCallType . '/' . $this->_outputType . '?key=' . $this->_apiKey . '&sensor=' . $this->_sensor;
 
-			if($this->_apiCallType=="add") {
-				$locationArray = explode(",", $this->_location);
+			if($this->_apiCallType=='add') {
+				$locationArray = explode(',', $this->_location);
 				$lat = trim($locationArray[0]);
 				$lng = trim($locationArray[1]);
 
@@ -134,11 +134,11 @@ class googlePlaces
 				$postData['location']['lng'] = $lng;
 				$postData['accuracy'] = $this->_accuracy;
 				$postData['name'] = $this->_name;
-				$postData['types'] = explode("|", $this->_types);
+				$postData['types'] = explode('|', $this->_types);
 				$postData['language'] = $this->_language;
 			}
 
-			if($this->_apiCallType=="delete") {
+			if($this->_apiCallType=='delete') {
 				$postData['reference'] = $this->_reference;
 			}
 
@@ -148,42 +148,42 @@ class googlePlaces
 
 		}
 
-		if($this->_apiCallType=="search") {
-			$URLparams = "location=".$this->_location."&radius=".$this->_radius."&types=".$this->_types."&language=".$this->_language."&name=".$this->_name."&sensor=".$this->_sensor;
+		if($this->_apiCallType=='search') {
+			$URLparams = 'location=' . $this->_location . '&radius='.$this->_radius . '&types=' . $this->_types . '&language=' . $this->_language . '&name=' . $this->_name . '&sensor=' . $this->_sensor;
 		}
 	
-		if($this->_apiCallType=="details") {
-			$URLparams = "reference=".$this->_reference."&language=".$this->_language."&sensor=".$this->_sensor;
+		if($this->_apiCallType=='details') {
+			$URLparams = 'reference=' . $this->_reference . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
 		}
 	
-		if($this->_apiCallType=="check-in") {
-			$URLparams = "reference=".$this->_reference."&language=".$this->_language."&sensor=".$this->_sensor;
+		if($this->_apiCallType=='check-in') {
+			$URLparams = 'reference=' . $this->_reference . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
 		}
 	
-		$URLToCall = $this->_apiUrl."/".$this->_apiCallType."/".$this->_outputType."?key=".$this->_apiKey."&".$URLparams;
+		$URLToCall = $this->_apiUrl . '/' . $this->_apiCallType . '/' . $this->_outputType . '?key='.$this->_apiKey . '&' . $URLparams;
 		$result = json_decode($this->_curlCall($URLToCall), true);
 		$result['errors'] = $this->_errors;
 	
-		if($result['status']=="OK" && $this->_apiCallType=="details") {
+		if($result['status']=='OK' && $this->_apiCallType=='details') {
 			foreach($result['result']['address_components'] as $key=>$component) {
 	
-				if($component['types'][0]=="street_number") {
+				if($component['types'][0]=='street_number') {
 					$address_street_number = $component['short_name'];
 				}
 	
-				if($component['types'][0]=="route") {
+				if($component['types'][0]=='route') {
 					$address_street_name = $component['short_name'];
 				}
 	
-				if($component['types'][0]=="locality") {
+				if($component['types'][0]=='locality') {
 					$address_city = $component['short_name'];
 				}
 	
-				if($component['types'][0]=="administrative_area_level_1") {
+				if($component['types'][0]=='administrative_area_level_1') {
 					$address_state = $component['short_name'];
 				}
 	
-				if($component['types'][0]=="postal_code") {
+				if($component['types'][0]=='postal_code') {
 					$address_postal_code = $component['short_name'];
 				}
 			}
