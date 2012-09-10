@@ -175,7 +175,8 @@ class googlePlaces
 				$this->_apiCallType = 'search';
 			break;
 		}
-	
+		$URLparams = urlencode($URLparams);
+
 		$URLToCall = $this->_apiUrl . '/' . $this->_apiCallType . '/' . $this->_outputType . '?key='.$this->_apiKey . '&' . $URLparams;
 
 		$result = json_decode($this->_curlCall($URLToCall), true);
