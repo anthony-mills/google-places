@@ -16,6 +16,7 @@ class googlePlaces
 	protected $_sensor = 'false'; // Required simply True or False, is the provided $_location coming from GPS?
 	protected $_reference;
 	protected $_accuracy;
+	protected $_pageToken;
 	
 	public function __construct($apiKey)
 	{
@@ -53,6 +54,14 @@ class googlePlaces
 	public function delete()
 	{
 		$this->_apiCallType = 'delete';
+
+		return $this->_apiCall();
+	}
+
+	public function repeat($pageToken)
+	{
+		$this->_apiCallType = 'repeat';
+		$this->_pageToken = $pageToken;
 
 		return $this->_apiCall();
 	}
@@ -148,19 +157,27 @@ class googlePlaces
 
 		}
 
-		if($this->_apiCallType=='search') {
-			$URLparams = 'location=' . $this->_location . '&radius='.$this->_radius . '&types=' . $this->_types . '&language=' . $this->_language . '&name=' . $this->_name . '&sensor=' . $this->_sensor;
-		}
+		switch ($this->_apiCallType) {
+			case('search'):
+				$URLparams = 'location=' . $this->_location . '&radius='.$this->_radius . '&types=' . $this->_types . '&language=' . $this->_language . '&name=' . $this->_name . '&sensor=' . $this->_sensor;
+			break;
 	
-		if($this->_apiCallType=='details') {
-			$URLparams = 'reference=' . $this->_reference . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
-		}
+			case('details'):
+				$URLparams = 'reference=' . $this->_reference . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
+			break;
 	
-		if($this->_apiCallType=='check-in') {
-			$URLparams = 'reference=' . $this->_reference . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
+			case('check-in'):
+				$URLparams = 'reference=' . $this->_reference . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
+			break;
+
+			case('repeat'):
+				$URLparams = 'radius='.$this->_radius . '&sensor=' . $this->_sensor . '&pagetoken=' . $this->_pageToken;
+				$this->_apiCallType = 'search';
+			break;
 		}
 	
 		$URLToCall = $this->_apiUrl . '/' . $this->_apiCallType . '/' . $this->_outputType . '?key='.$this->_apiKey . '&' . $URLparams;
+
 		$result = json_decode($this->_curlCall($URLToCall), true);
 		$result['errors'] = $this->_errors;
 	
