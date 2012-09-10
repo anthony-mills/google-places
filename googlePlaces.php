@@ -159,7 +159,7 @@ class googlePlaces
 
 		switch ($this->_apiCallType) {
 			case('search'):
-				$URLparams = 'location=' . $this->_location . '&radius='.$this->_radius . '&types=' . $this->_types . '&language=' . $this->_language . '&name=' . $this->_name . '&sensor=' . $this->_sensor;
+				$URLparams = 'location=' . $this->_location . '&radius='.$this->_radius . '&types=' . urlencode($this->_types) . '&language=' . $this->_language . '&name=' . $this->_name . '&sensor=' . $this->_sensor;
 			break;
 	
 			case('details'):
@@ -175,10 +175,9 @@ class googlePlaces
 				$this->_apiCallType = 'search';
 			break;
 		}
-		$URLparams = urlencode($URLparams);
-
+		
 		$URLToCall = $this->_apiUrl . '/' . $this->_apiCallType . '/' . $this->_outputType . '?key='.$this->_apiKey . '&' . $URLparams;
-
+	
 		$result = json_decode($this->_curlCall($URLToCall), true);
 		$result['errors'] = $this->_errors;
 	
