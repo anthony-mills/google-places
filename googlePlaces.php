@@ -220,6 +220,7 @@ class googlePlaces
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HEADER, FALSE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		if (!empty($topost)) {
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $topost);
