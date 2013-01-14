@@ -17,6 +17,7 @@ class googlePlaces
 	protected $_reference;
 	protected $_accuracy;
 	protected $_pageToken;
+	protected $_curloptSslVerifypeer = true; // option CURLOPT_SSL_VERIFYPEER with true value working not always
 	
 	public function __construct($apiKey)
 	{
@@ -110,6 +111,11 @@ class googlePlaces
 	{
 		$this->_includeDetails = $includeDetails;
 	}
+	
+	 public function setCurloptSslVerifypeer($curloptSslVerifypeer)
+	{
+        	$this->_curloptSslVerifypeer = $curloptSslVerifypeer;
+    	}
 
 	protected function _checkErrors()
 	{
@@ -220,7 +226,7 @@ class googlePlaces
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HEADER, FALSE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->_curloptSslVerifypeer);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		if (!empty($topost)) {
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $topost);
