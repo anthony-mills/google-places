@@ -10,6 +10,7 @@ class googlePlaces
 	protected $_includeDetails = false;
 	protected $_language = 'en';
 	protected $_location; // Required - This must be provided as a google.maps.LatLng object.
+	protected $_query; //Required if using textsearch
 	protected $_radius; // Required
 	protected $_types; // Optional - separate type with pipe symbol http://code.google.com/apis/maps/documentation/places/supported_types.html
 	protected $_name; // Optional
@@ -30,6 +31,12 @@ class googlePlaces
 
 		return $this->_apiCall();
 	}
+	
+	public function textSearch() {
+        	$this->_apiCallType = 'textsearch';
+
+        	return $this->_apiCall();
+    	}
 
 	public function details()
 	{
@@ -71,6 +78,10 @@ class googlePlaces
 	{
 		$this->_location = $location;
 	}
+	
+	public function setQuery($query) {
+        $this->_query = preg_replace('/\s/', '+', $query);
+    	}
 
 	public function setRadius($radius)
 	{
@@ -167,6 +178,10 @@ class googlePlaces
 			case('search'):
 				$URLparams = 'location=' . $this->_location . '&radius='.$this->_radius . '&types=' . urlencode($this->_types) . '&language=' . $this->_language . '&name=' . $this->_name . '&sensor=' . $this->_sensor;
 			break;
+			
+			 case ('textsearch'):
+                		$URLparams = 'query=' . $this->_query . '&location=' . $this->_location . '&radius=' . $this->_radius . '&types=' . urlencode($this->_types) . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
+                	break;
 	
 			case('details'):
 				$URLparams = 'reference=' . $this->_reference . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
@@ -187,7 +202,7 @@ class googlePlaces
 		$result = json_decode($this->_curlCall($URLToCall), true);
 		$result['errors'] = $this->_errors;
 	
-		if($result['status']=='OK' && $this->_apiCallType=='details') {
+		if(isset($result['status'])&&$result['status']=='OK' && $this->_apiCallType=='details') {
 			foreach($result['result']['address_components'] as $key=>$component) {
 	
 				if($component['types'][0]=='street_number') {
