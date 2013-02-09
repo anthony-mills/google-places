@@ -156,8 +156,8 @@ class googlePlaces
 				$lng = trim($locationArray[1]);
 
 				$postData = array();
-				$postData['location']['lat'] = $lat;
-				$postData['location']['lng'] = $lng;
+				$postData['location']['lat'] = floatval($lat);
+				$postData['location']['lng'] = floatval($lng);
 				$postData['accuracy'] = $this->_accuracy;
 				$postData['name'] = $this->_name;
 				$postData['types'] = explode('|', $this->_types);
