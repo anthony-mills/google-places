@@ -80,7 +80,7 @@ class googlePlaces
 	}
 	
 	public function setQuery($query) {
-        $this->_query = preg_replace('/\s/', '+', $query);
+	        $this->_query = preg_replace('/\s/', '+', $query);
     	}
 
 	public function setRadius($radius)
@@ -122,8 +122,8 @@ class googlePlaces
 	{
 		$this->_includeDetails = $includeDetails;
 	}
-	
-	 public function setCurloptSslVerifypeer($curloptSslVerifypeer)
+
+	public function setCurloptSslVerifypeer($curloptSslVerifypeer)
 	{
         	$this->_curloptSslVerifypeer = $curloptSslVerifypeer;
     	}
@@ -156,8 +156,8 @@ class googlePlaces
 				$lng = trim($locationArray[1]);
 
 				$postData = array();
-				$postData['location']['lat'] = $lat;
-				$postData['location']['lng'] = $lng;
+				$postData['location']['lat'] = floatval($lat);
+				$postData['location']['lng'] = floatval($lng);
 				$postData['accuracy'] = $this->_accuracy;
 				$postData['name'] = $this->_name;
 				$postData['types'] = explode('|', $this->_types);
