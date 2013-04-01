@@ -190,6 +190,12 @@ class googlePlaces {
         if(isset($result['status']) && $result['status'] == self::OK_STATUS && isset($result[$resultColumnName]['address_components'])) {
             foreach($result[$resultColumnName]['address_components'] as $key => $component) {
 
+				$address_street_number='';
+				$address_street_name='';
+				$address_city='';
+				$address_state='';
+				$address_postal_code='';
+
                 if($component['types'][0]=='street_number') {
                     $address_street_number = $component['short_name'];
                 }
