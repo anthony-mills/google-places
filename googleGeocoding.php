@@ -177,7 +177,7 @@ class googleGeocoding {
      ***********************/
 
     public function setAddress($address) {
-        $this->_address = $address;
+        $this->_address = urlencode($address);
     }
 
     public function setLatlng($latlng) {
