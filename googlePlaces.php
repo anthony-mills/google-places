@@ -4,37 +4,37 @@ class googlePlaces {
 
     const OK_STATUS = 'OK';
 
-	public $_outputType = 'json'; //either json, xml or array
-	public $_errors = array();
-		
-	private $_apiKey = '';
-    private $_apiUrl = 'https://maps.googleapis.com/maps/api/place';
-    private $_apiCallType = '';
-    private $_includeDetails = false;
-    private $_language = 'en';
+    public $_outputType = 'json'; //either json, xml or array
+    public $_errors = array();
+    	
+    protected $_apiKey = '';
+    protected $_apiUrl = 'https://maps.googleapis.com/maps/api/place';
+    protected $_apiCallType = '';
+    protected $_includeDetails = false;
+    protected $_language = 'en';
 
     // REQUIRED:
-    private $_location;           // Required - This must be provided as a google.maps.LatLng object.
-    private $_query;              // Required if using textsearch
-    private $_radius = 50000;     // Required if using nearbysearch or radarsearch (50,000 meters max)
-    private $_sensor = 'false';   // Required simply True or False, is the provided $_location coming from GPS?
+    protected $_location;           // Required - This must be provided as a google.maps.LatLng object.
+    protected $_query;              // Required if using textsearch
+    protected $_radius = 50000;     // Required if using nearbysearch or radarsearch (50,000 meters max)
+    protected $_sensor = 'false';   // Required simply True or False, is the provided $_location coming from GPS?
 
-    private $_types;              // Optional - separate type with pipe symbol http://code.google.com/apis/maps/documentation/places/supported_types.html
-    private $_name;               // Optional
-    private $_keyword;            // Optional - "A term to be matched against all content that Google has indexed for this Place, including but not limited to name, type, and address, as well as customer reviews and other third-party content."
-    private $_reference;
-    private $_accuracy;
-    private $_pageToken;
-    private $_curloptSslVerifypeer = true; // option CURLOPT_SSL_VERIFYPEER with true value working not always
+    protected $_types;              // Optional - separate type with pipe symbol http://code.google.com/apis/maps/documentation/places/supported_types.html
+    protected $_name;               // Optional
+    protected $_keyword;            // Optional - "A term to be matched against all content that Google has indexed for this Place, including but not limited to name, type, and address, as well as customer reviews and other third-party content."
+    protected $_reference;
+    protected $_accuracy;
+    protected $_pageToken;
+    protected $_curloptSslVerifypeer = true; // option CURLOPT_SSL_VERIFYPEER with true value working not always
 
     /**
      * constructor - creates a googlePlaces object with the specified API Key
      *
      * @param $apiKey - the API Key to use
      */
-	public function __construct($apiKey) {
-		$this->_apiKey = $apiKey;	
-	}
+    public function __construct($apiKey) {
+        $this->_apiKey = $apiKey;	
+    }
 
     // for backward compatibility
     public function search() {
@@ -44,11 +44,10 @@ class googlePlaces {
     }
 
     // hits the v3 API
-	public function nearbySearch() {
-		$this->_apiCallType = googlePlacesCallType::NEARBY_SEARCH;
-
-		return $this->_executeAPICall();
-	}
+    public function nearbySearch() {
+        $this->_apiCallType = googlePlacesCallType::NEARBY_SEARCH;
+        return $this->_executeAPICall();
+    }
 
     // hits the v3 API
     public function radarSearch() {
@@ -100,7 +99,7 @@ class googlePlaces {
      *
      * @return mixed - the array resulting from the Google Places API call specified by the members of this class
      */
-    private function _executeAPICall()
+    protected function _executeAPICall()
     {
         $this->_checkErrors();
 
@@ -123,7 +122,7 @@ class googlePlaces {
      * _checkErrors - Checks to see if this Google Places request has all of the required fields as far as we know. In the
      * event that it doesn't, it'll populate the _errors array with an error message for each error found.
      */
-	private function _checkErrors() {
+	protected function _checkErrors() {
 		if(empty($this->_apiCallType)) {
 			$this->_errors[] = 'API Call Type is required but is missing.';
 		}
@@ -143,7 +142,7 @@ class googlePlaces {
      *
      * @return mixed - the Google Places API response for the given call type
      */
-    private function _executeAddOrDelete() {
+    protected function _executeAddOrDelete() {
         $postUrl = $this->_apiUrl . '/' . $this->_apiCallType . '/' . $this->_outputType . '?key=' . $this->_apiKey . '&sensor=' . $this->_sensor;
 
         if($this->_apiCallType == googlePlacesCallType::ADD) {
@@ -175,7 +174,7 @@ class googlePlaces {
      * @param mixed $result - the Google Places result array
      * @return mixed - the formatted Google Places result array
      */
-    private function _formatResults($result) {
+    protected function _formatResults($result) {
         $formattedResults = array();
         $formattedResults['errors'] = $this->_errors;
 
@@ -232,7 +231,7 @@ class googlePlaces {
      *
      * @return string - the formatted parameter request string based on the call type
      */
-    private function _formatParametersForURL() {
+    protected function _formatParametersForURL() {
 
        $parameterString = '';
 
@@ -278,7 +277,7 @@ class googlePlaces {
      * @param array $dataToPost - the data to post in the curl call (if any)
      * @return mixed - the response payload of the call
      */
-	private function _curlCall($url,$topost = array())
+	protected function _curlCall($url,$topost = array())
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
