@@ -104,7 +104,7 @@ class googlePlaces {
         $this->_checkErrors();
 
         if($this->_apiCallType == googlePlacesCallType::ADD || $this->_apiCallType == googlePlacesCallType::DELETE) {
-            $this->_executeAddOrDelete();
+            return $this->_executeAddOrDelete();
         }
 
         $urlParameterString = $this->_formatParametersForURL();
