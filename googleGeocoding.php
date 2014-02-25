@@ -15,21 +15,21 @@ class googleGeocoding {
     public $_outputType = 'json'; //either json, xml or array
     public $_errors = array();
 
-    private $_apiKey = '';
-    private $_apiUrl = 'https://maps.googleapis.com/maps/api/geocode';
+    protected $_apiKey = '';
+    protected $_apiUrl = 'https://maps.googleapis.com/maps/api/geocode';
 
     // REQUIRED
-    private $_address;            // Required if no latlng or components - The address that you want to geocode.
-    private $_latlng;             // Required if no address or components - The textual latitude/longitude value for which you wish to obtain the closest, human-readable address. See Reverse Geocoding for more information.
-    private $_components;         // Required if no address or latlng - A component filter for which you wish to obtain a geocode. See Component Filtering for more information. The components filter will also be accepted as an optional parameter if an address is provided.
-    private $_sensor = 'false';   // Indicates whether or not the geocoding request comes from a device with a location sensor. This value must be either true or false.
+    protected $_address;            // Required if no latlng or components - The address that you want to geocode.
+    protected $_latlng;             // Required if no address or components - The textual latitude/longitude value for which you wish to obtain the closest, human-readable address. See Reverse Geocoding for more information.
+    protected $_components;         // Required if no address or latlng - A component filter for which you wish to obtain a geocode. See Component Filtering for more information. The components filter will also be accepted as an optional parameter if an address is provided.
+    protected $_sensor = 'false';   // Indicates whether or not the geocoding request comes from a device with a location sensor. This value must be either true or false.
 
     // OPTIONAL
-    private $_bounds;             // The bounding box of the viewport within which to bias geocode results more prominently. This parameter will only influence, not fully restrict, results from the geocoder.
-    private $_language = 'en';    // The language in which to return results. See the list of supported domain languages. Note that we often update supported languages so this list may not be exhaustive. If language is not supplied, the geocoder will attempt to use the native language of the domain from which the request is sent wherever possible.
-    private $_region;             // The region code, specified as a ccTLD ("top-level domain") two-character value. This parameter will only influence, not fully restrict, results from the geocoder. (For more information see Region Biasing below.)
+    protected $_bounds;             // The bounding box of the viewport within which to bias geocode results more prominently. This parameter will only influence, not fully restrict, results from the geocoder.
+    protected $_language = 'en';    // The language in which to return results. See the list of supported domain languages. Note that we often update supported languages so this list may not be exhaustive. If language is not supplied, the geocoder will attempt to use the native language of the domain from which the request is sent wherever possible.
+    protected $_region;             // The region code, specified as a ccTLD ("top-level domain") two-character value. This parameter will only influence, not fully restrict, results from the geocoder. (For more information see Region Biasing below.)
 
-    private $_curloptSslVerifypeer = true; // option CURLOPT_SSL_VERIFYPEER with true value working not always
+    protected $_curloptSslVerifypeer = true; // option CURLOPT_SSL_VERIFYPEER with true value working not always
 
     /**
      * constructor - creates a googleGeocoding object with the specified API Key
@@ -64,7 +64,7 @@ class googleGeocoding {
      * _checkErrors - Checks to see if this google Geocoding request has all of the required fields as far as we know. In the
      * event that it doesn't, it'll populate the _errors array with an error message for each error found.
      */
-    private function _checkErrors() {
+    protected function _checkErrors() {
 
         if (empty($this->_apiKey)) {
             $this->_errors[] = 'API Key is is required but is missing.';
@@ -80,7 +80,7 @@ class googleGeocoding {
      *
      * @return string - the parameters in URL string form
      */
-    private function _formatParametersForURL() {
+    protected function _formatParametersForURL() {
 
         return  self::ADDRESS_FIELD_NAME.'='.$this->_address .
             '&'.self::LAT_LNG_FIELD_NAME.'='.$this->_latlng .
@@ -97,7 +97,7 @@ class googleGeocoding {
      * @param mixed $result - the Google Geocode result array
      * @return mixed - the formatted Google Geocode result array
      */
-    private function _formatResults($result) {
+    protected function _formatResults($result) {
         $formattedResults = array();
         $formattedResults['errors'] = $this->_errors;
 
@@ -151,7 +151,7 @@ class googleGeocoding {
      * @param array $dataToPost - the data to post in the curl call (if any)
      * @return mixed - the response payload of the call
      */
-    private function _curlCall($url, $dataToPost = array()) {
+    protected function _curlCall($url, $dataToPost = array()) {
 
         $ch = curl_init();
 
