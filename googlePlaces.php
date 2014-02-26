@@ -19,9 +19,10 @@ class googlePlaces {
     protected $_radius = 50000;     // Required if using nearbysearch or radarsearch (50,000 meters max)
     protected $_sensor = 'false';   // Required simply True or False, is the provided $_location coming from GPS?
 
-    protected $_types;              // Optional - separate type with pipe symbol http://code.google.com/apis/maps/documentation/places/supported_types.html
+    protected $_types = '';              // Optional - Separate type with pipe symbol http://code.google.com/apis/maps/documentation/places/supported_types.html
     protected $_name;               // Optional
     protected $_keyword;            // Optional - "A term to be matched against all content that Google has indexed for this Place, including but not limited to name, type, and address, as well as customer reviews and other third-party content."
+    protected $_rankBy = 'prominence';  // Optional - This option sorts the order of the places returned from the API, by their importance or the distance from the search point. Possible values are PROMINENCE or DISTANCE.
     protected $_reference;
     protected $_accuracy;
     protected $_pageToken;
@@ -237,18 +238,22 @@ class googlePlaces {
 
         switch ($this->_apiCallType) {
             case(googlePlacesCallType::SEARCH):
-                $parameterString = 'location=' . $this->_location . '&radius='.$this->_radius . '&types=' . urlencode($this->_types) . '&language=' . $this->_language . '&name=' . $this->_name . '&keyword=' . $this->_keyword. '&sensor=' . $this->_sensor;
+                $parameterString = 'location=' . $this->_location . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
+                $parameterString = $this->_urlDependencies($parameterString);
                 break;
             case(googlePlacesCallType::NEARBY_SEARCH):
-                $parameterString = 'location=' . $this->_location . '&radius='.$this->_radius . '&types=' . urlencode($this->_types) . '&language=' . $this->_language . '&name=' . $this->_name . '&keyword=' . $this->_keyword. '&sensor=' . $this->_sensor;
+                $parameterString = 'location=' . $this->_location . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
+                $parameterString = $this->_urlDependencies($parameterString);                
                 break;
 
             case(googlePlacesCallType::RADAR_SEARCH):
-                $parameterString = 'location=' . $this->_location . '&radius='.$this->_radius . '&types=' . urlencode($this->_types) . '&language=' . $this->_language . '&name=' . $this->_name . '&keyword=' . $this->_keyword. '&sensor=' . $this->_sensor;
+                $parameterString = 'location=' . $this->_location . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
+                $parameterString = $this->_urlDependencies($parameterString);                
                 break;
 
             case (googlePlacesCallType::TEXT_SEARCH):
-                $parameterString = 'query=' . $this->_query . '&location=' . $this->_location . '&radius=' . $this->_radius . '&types=' . urlencode($this->_types) . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
+                $parameterString = 'query=' . $this->_query . '&location=' . $this->_location . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
+                $parameterString = $this->_urlDependencies($parameterString);
                 break;
 
             case(googlePlacesCallType::DETAILS_SEARCH):
@@ -265,9 +270,27 @@ class googlePlaces {
                 break;
         }
 
+
         return $parameterString;
     }
 
+    /**
+    * Controls the use of incompatable parameters when constructing a URL
+    *
+    * i.e ranking the results by distance requires a keyword, name or types parameter to be defined but it cannot be used in conjunction with a search radius
+    *
+    * @param string $parameterString
+    * @return string $parameterString
+    */
+    protected function _urlDependencies($parameterString) {
+        if (($this->_rankBy == 'distance') && ((!empty($this->_types)) || (!empty($this->_name)) || (!empty($this->_keyword)))) {
+            $parameterString .= '&name=' . $this->_name . '&keyword=' . $this->_keyword. '&types=' . urlencode($this->_types) . '&rankby=' . $this->_rankBy;
+        } else {
+            $parameterString .= '&name=' . $this->_name . '&keyword=' . $this->_keyword. '&types=' . urlencode($this->_types) . '&radius='.$this->_radius;
+        }
+
+        return $parameterString; 
+    }
 
     /**
      * _curlCall - Executes a curl call to the specified url with the specified data to post and returns the result. If
@@ -277,7 +300,7 @@ class googlePlaces {
      * @param array $dataToPost - the data to post in the curl call (if any)
      * @return mixed - the response payload of the call
      */
-	protected function _curlCall($url,$topost = array())
+	protected function _curlCall($url, $topost = array())
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -341,6 +364,14 @@ class googlePlaces {
 
     public function setIncludeDetails($includeDetails) {
         $this->_includeDetails = $includeDetails;
+    }
+
+    public function setRankBy($rankBy) {
+        $rankBy = strtolower($rankBy);
+
+        if (($rankBy == 'prominence') || ($rankBy = 'distance')) {
+            $this->_rankBy = $rankBy;
+        }        
     }
 
     public function setCurloptSslVerifypeer($curloptSslVerifypeer) {
