@@ -6,7 +6,7 @@ class googlePlaces {
 
     public $_outputType = 'json'; //either json, xml or array
     public $_errors = array();
-    	
+
     protected $_apiKey = '';
     protected $_apiUrl = 'https://maps.googleapis.com/maps/api/place';
     protected $_apiCallType = '';
@@ -34,7 +34,7 @@ class googlePlaces {
      * @param $apiKey - the API Key to use
      */
     public function __construct($apiKey) {
-        $this->_apiKey = $apiKey;	
+        $this->_apiKey = $apiKey;
     }
 
     // for backward compatibility
@@ -66,7 +66,7 @@ class googlePlaces {
 
 	public function details() {
 		$this->_apiCallType = googlePlacesCallType::DETAILS_SEARCH;
-		
+
 		return $this->_executeAPICall();
 	}
 
@@ -188,13 +188,14 @@ class googlePlaces {
         $formattedResults['result'] = $result[$resultColumnName];
 
         if(isset($result['status']) && $result['status'] == self::OK_STATUS && isset($result[$resultColumnName]['address_components'])) {
-            foreach($result[$resultColumnName]['address_components'] as $key => $component) {
 
-				$address_street_number='';
-				$address_street_name='';
-				$address_city='';
-				$address_state='';
-				$address_postal_code='';
+            $address_street_number='';
+            $address_street_name='';
+            $address_city='';
+            $address_state='';
+            $address_postal_code='';
+
+            foreach($result[$resultColumnName]['address_components'] as $key => $component) {
 
                 if($component['types'][0]=='street_number') {
                     $address_street_number = $component['short_name'];
@@ -243,12 +244,12 @@ class googlePlaces {
                 break;
             case(googlePlacesCallType::NEARBY_SEARCH):
                 $parameterString = 'location=' . $this->_location . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
-                $parameterString = $this->_urlDependencies($parameterString);                
+                $parameterString = $this->_urlDependencies($parameterString);
                 break;
 
             case(googlePlacesCallType::RADAR_SEARCH):
                 $parameterString = 'location=' . $this->_location . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
-                $parameterString = $this->_urlDependencies($parameterString);                
+                $parameterString = $this->_urlDependencies($parameterString);
                 break;
 
             case (googlePlacesCallType::TEXT_SEARCH):
@@ -289,7 +290,7 @@ class googlePlaces {
             $parameterString .= '&name=' . $this->_name . '&keyword=' . $this->_keyword. '&types=' . urlencode($this->_types) . '&radius='.$this->_radius;
         }
 
-        return $parameterString; 
+        return $parameterString;
     }
 
     /**
@@ -371,7 +372,7 @@ class googlePlaces {
 
         if (($rankBy == 'prominence') || ($rankBy = 'distance')) {
             $this->_rankBy = $rankBy;
-        }        
+        }
     }
 
     public function setCurloptSslVerifypeer($curloptSslVerifypeer) {
