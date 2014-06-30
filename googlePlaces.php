@@ -23,7 +23,7 @@ class googlePlaces {
     protected $_name;               // Optional
     protected $_keyword;            // Optional - "A term to be matched against all content that Google has indexed for this Place, including but not limited to name, type, and address, as well as customer reviews and other third-party content."
     protected $_rankBy = 'prominence';  // Optional - This option sorts the order of the places returned from the API, by their importance or the distance from the search point. Possible values are PROMINENCE or DISTANCE.
-    protected $_reference;
+    protected $_placeId;
     protected $_accuracy;
     protected $_pageToken;
     protected $_curloptSslVerifypeer = true; // option CURLOPT_SSL_VERIFYPEER with true value working not always
@@ -161,7 +161,7 @@ class googlePlaces {
         }
 
         if($this->_apiCallType == googlePlacesCallType::DELETE) {
-            $postData['reference'] = $this->_reference;
+            $postData['placeid'] = $this->_placeId;
         }
 
         $result = json_decode($this->_curlCall($postUrl,json_encode($postData)));
@@ -257,11 +257,11 @@ class googlePlaces {
                 break;
 
             case(googlePlacesCallType::DETAILS_SEARCH):
-                $parameterString = 'reference=' . $this->_reference . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
+                $parameterString = 'placeid=' . $this->_placeId . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
                 break;
 
             case(googlePlacesCallType::CHECKIN):
-                $parameterString = 'reference=' . $this->_reference . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
+                $parameterString = 'placeid=' . $this->_placeId . '&language=' . $this->_language . '&sensor=' . $this->_sensor;
                 break;
 
             case(googlePlacesCallType::REPEAT):
@@ -354,8 +354,8 @@ class googlePlaces {
         $this->_sensor = $sensor;
     }
 
-    public function setReference($reference) {
-        $this->_reference = $reference;
+    public function setPlaceId($placeId) {
+        $this->_placeId = $placeId;
     }
 
     public function setAccuracy($accuracy) {
