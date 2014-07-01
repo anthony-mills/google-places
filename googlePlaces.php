@@ -95,6 +95,12 @@ class googlePlaces {
 		return $this->_executeAPICall();
 	}
 
+    public function photo($photoReference, $maxwidth=false, $maxheight=false) {
+        $pixelConstraints = ($maxheight) ? "&maxheight=$maxheight" : "";
+        $pixelConstraints .= ($maxwidth) ? "&maxwidth=$maxwidth" : "";
+        return $this->_apiUrl . '/photo?key=' . $this->_apiKey . '&photoreference=' . $photoReference . $pixelConstraints;
+    }
+
     /**
      * executeAPICall - Executes the Google Places API call specified by this class's members and returns the results as an array
      *
