@@ -224,6 +224,10 @@ class googlePlaces {
             $formattedResults['result']['address_fixed']['address_postal_code'] = $address_postal_code;
         }
 
+        if ( isset( $result['next_page_token'] ) ) {
+            $formattedResults['next_page_token'] = $result['next_page_token'];
+        }
+
         return $formattedResults;
     }
 
