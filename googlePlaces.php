@@ -196,23 +196,23 @@ class googlePlaces {
 				$address_state='';
 				$address_postal_code='';
 
-                if($component['types'][0]=='street_number') {
+                if($component['types'] && $component['types'][0]=='street_number') {
                     $address_street_number = $component['short_name'];
                 }
 
-                if($component['types'][0]=='route') {
+                if($component['types'] && $component['types'][0]=='route') {
                     $address_street_name = $component['short_name'];
                 }
 
-                if($component['types'][0]=='locality') {
+                if($component['types'] && $component['types'][0]=='locality') {
                     $address_city = $component['short_name'];
                 }
 
-                if($component['types'][0]=='administrative_area_level_1') {
+                if($component['types'] && $component['types'][0]=='administrative_area_level_1') {
                     $address_state = $component['short_name'];
                 }
 
-                if($component['types'][0]=='postal_code') {
+                if($component['types'] && $component['types'][0]=='postal_code') {
                     $address_postal_code = $component['short_name'];
                 }
             }
