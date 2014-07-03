@@ -95,6 +95,12 @@ class googlePlaces {
 		return $this->_executeAPICall();
 	}
 
+    public function photo($photoReference, $maxwidth=false, $maxheight=false) {
+        $pixelConstraints = ($maxheight) ? "&maxheight=$maxheight" : "";
+        $pixelConstraints .= ($maxwidth) ? "&maxwidth=$maxwidth" : "";
+        return $this->_apiUrl . '/photo?key=' . $this->_apiKey . '&photoreference=' . $photoReference . $pixelConstraints;
+    }
+
     /**
      * executeAPICall - Executes the Google Places API call specified by this class's members and returns the results as an array
      *
@@ -196,23 +202,23 @@ class googlePlaces {
 				$address_state='';
 				$address_postal_code='';
 
-                if($component['types'][0]=='street_number') {
+                if($component['types'] && $component['types'][0]=='street_number') {
                     $address_street_number = $component['short_name'];
                 }
 
-                if($component['types'][0]=='route') {
+                if($component['types'] && $component['types'][0]=='route') {
                     $address_street_name = $component['short_name'];
                 }
 
-                if($component['types'][0]=='locality') {
+                if($component['types'] && $component['types'][0]=='locality') {
                     $address_city = $component['short_name'];
                 }
 
-                if($component['types'][0]=='administrative_area_level_1') {
+                if($component['types'] && $component['types'][0]=='administrative_area_level_1') {
                     $address_state = $component['short_name'];
                 }
 
-                if($component['types'][0]=='postal_code') {
+                if($component['types'] && $component['types'][0]=='postal_code') {
                     $address_postal_code = $component['short_name'];
                 }
             }
@@ -222,6 +228,10 @@ class googlePlaces {
             $formattedResults['result']['address_fixed']['address_city'] = $address_city;
             $formattedResults['result']['address_fixed']['address_state'] = $address_state;
             $formattedResults['result']['address_fixed']['address_postal_code'] = $address_postal_code;
+        }
+
+        if ( isset( $result['next_page_token'] ) ) {
+            $formattedResults['next_page_token'] = $result['next_page_token'];
         }
 
         return $formattedResults;
