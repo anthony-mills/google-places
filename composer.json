@@ -1,7 +1,7 @@
 {
     "name": "mills/google-places",
     "description": "PHP wrapper Google Places API",
-    "keywords": ["places","geolocation","api"],
+    "keywords": ["places","geolocation","api","googleplaces","locate"],
     "homepage": "https://github.com/anthony-mills/google-places",
     "license": "GPLV2",
     "repositories": [
