@@ -186,16 +186,21 @@ class googlePlaces {
         $formattedResults = array();
         $formattedResults['errors'] = $this->_errors;
 
-        // for backward compatibility
-        $resultColumnName = 'result';
-        if (!isset($result[$resultColumnName])) {
-            $resultColumnName = 'results';
-        }
+		if (isset($result['error_message'])) {
+			$formattedResults['errors'][] = $result['error_message'];
+		}
 
-        $formattedResults['result'] = $result[$resultColumnName];
+		// for backward compatibility
+		$resultColumnName = 'result';
+		if (!isset($result[$resultColumnName])) {
+			$resultColumnName = 'results';
+		}
 
         if(isset($result['status']) && $result['status'] == self::OK_STATUS && isset($result[$resultColumnName]['address_components'])) {
 
+			$formattedResults['result'] = $result[$resultColumnName];
+
+            $address_premise='';
             $address_street_number='';
             $address_street_name='';
             $address_city='';
@@ -203,6 +208,10 @@ class googlePlaces {
             $address_postal_code='';
 
             foreach($result[$resultColumnName]['address_components'] as $key => $component) {
+
+                if($component['types'] && $component['types'][0]=='premise') {
+					$address_premise = $component['short_name'];
+                }
 
                 if($component['types'] && $component['types'][0]=='street_number') {
                     $address_street_number = $component['short_name'];
@@ -225,6 +234,7 @@ class googlePlaces {
                 }
             }
 
+            $formattedResults['result']['address_fixed']['premise'] = $address_premise;
             $formattedResults['result']['address_fixed']['street_number'] = $address_street_number;
             $formattedResults['result']['address_fixed']['address_street_name'] = $address_street_name;
             $formattedResults['result']['address_fixed']['address_city'] = $address_city;
