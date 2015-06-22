@@ -1,6 +1,9 @@
 <?php
 namespace Mills\GooglePlaces;
 
+use Kdyby\Curl\CurlSender;
+use Kdyby\Curl\Request;
+
 class googlePlaces {
 
     const OK_STATUS = 'OK';
@@ -20,7 +23,8 @@ class googlePlaces {
     protected $_radius = 50000;     // Required if using nearbysearch or radarsearch (50,000 meters max)
     protected $_sensor = 'false';   // Required simply True or False, is the provided $_location coming from GPS?
 
-    protected $_types = '';              // Optional - Separate type with pipe symbol http://code.google.com/apis/maps/documentation/places/supported_types.html
+    protected $_proxy = []; 		// Optional – fields "host", "port", "username", "password"
+    protected $_types = '';         // Optional - Separate type with pipe symbol http://code.google.com/apis/maps/documentation/places/supported_types.html
     protected $_name;               // Optional
     protected $_keyword;            // Optional - "A term to be matched against all content that Google has indexed for this Place, including but not limited to name, type, and address, as well as customer reviews and other third-party content."
     protected $_rankBy = 'prominence';  // Optional - This option sorts the order of the places returned from the API, by their importance or the distance from the search point. Possible values are PROMINENCE or DISTANCE.
@@ -29,13 +33,15 @@ class googlePlaces {
     protected $_pageToken;
     protected $_curloptSslVerifypeer = true; // option CURLOPT_SSL_VERIFYPEER with true value working not always
 
-    /**
-     * constructor - creates a googlePlaces object with the specified API Key
-     *
-     * @param $apiKey - the API Key to use
-     */
-    public function __construct($apiKey) {
+	/**
+	 * constructor - creates a googlePlaces object with the specified API Key and with proxy if provided
+	 *
+	 * @param       $apiKey - the API Key to use
+	 * @param array $proxy
+	 */
+    public function __construct($apiKey, $proxy = []) {
         $this->_apiKey = $apiKey;
+        $this->_proxy = $proxy;
     }
 
     // for backward compatibility
@@ -319,7 +325,7 @@ class googlePlaces {
      * the post data is empty, the call will default to a GET
      *
      * @param $url - the url to curl to
-     * @param array $dataToPost - the data to post in the curl call (if any)
+     * @param array $topost - the data to post in the curl call (if any)
      * @return mixed - the response payload of the call
      */
 	protected function _curlCall($url, $topost = array())
@@ -332,10 +338,28 @@ class googlePlaces {
 		if (!empty($topost)) {
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $topost);
 		}
+
+		if ($this->_proxy) {
+			$this->setCurlProxy($ch);
+		}
+
 		$body = curl_exec($ch);
 		curl_close($ch);
 
 		return $body;
+	}
+
+	/**
+	 * Adds proxy to cUrl
+	 * @param $ch
+	 */
+	protected function setCurlProxy($ch) {
+		$url = $this->_proxy["host"].(!empty($this->_proxy["port"]) ? ':'.$this->_proxy["port"] : '');
+		curl_setopt($ch, CURLOPT_PROXY, $url);
+
+		if (!empty($this->_proxy["username"]) && !empty($this->_proxy["password"])) {
+			curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->_proxy["username"].":".$this->_proxy["password"]);
+		}
 	}
 
 
