@@ -31,3 +31,19 @@ if (!empty($firstSearch['next_page_token'])) {
 }
 ```
 The repeat function can be used twice for each search function allowing up to 60 individual results for each search request. 
+
+### Proxy ###
+When you use deployment server that changes IP address each time you run a new build, you may want to funnel your request through only one IP address. Therefore, you can allow only that single IP in Google Developers Console `server key`. For that purpose you should setup proxy to route your Google Maps API requests through that.
+
+When your proxy is set up, you can use it with googlePlaces.
+
+```php
+$proxy = [];
+$proxy["host"] = "your host name";
+$proxy["port"] = 8080;
+$proxy["username"] = "your username"; //optional with password
+$proxy["password"] = "your password";
+$apiKey       = 'Your Google Places API Key';
+$googlePlaces = new googlePlaces($apiKey, $proxy);
+
+```
