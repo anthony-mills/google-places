@@ -16,7 +16,7 @@ $longitude = '151.2107662';
 $googlePlaces->setLocation($latitude . ',' . $longitude);
 
 $googlePlaces->setRadius(5000);
-$results = $googlePlaces->Search();
+$results = $googlePlaces->search(); //
 ```
 
 A search query can be run again for a fresh set of results using the "paging" functionality that was recently added to the API.
