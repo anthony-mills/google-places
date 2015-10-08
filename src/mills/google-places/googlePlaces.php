@@ -4,7 +4,8 @@ namespace Mills\GooglePlaces;
 use Kdyby\Curl\CurlSender;
 use Kdyby\Curl\Request;
 
-class googlePlaces {
+class googlePlaces
+{
 
     const OK_STATUS = 'OK';
 
@@ -23,7 +24,7 @@ class googlePlaces {
     protected $_radius = 50000;     // Required if using nearbysearch or radarsearch (50,000 meters max)
     protected $_sensor = 'false';   // Required simply True or False, is the provided $_location coming from GPS?
 
-    protected $_proxy = []; 		// Optional – fields "host", "port", "username", "password"
+    protected $_proxy = [];        // Optional – fields "host", "port", "username", "password"
     protected $_types = '';         // Optional - Separate type with pipe symbol http://code.google.com/apis/maps/documentation/places/supported_types.html
     protected $_name;               // Optional
     protected $_keyword;            // Optional - "A term to be matched against all content that Google has indexed for this Place, including but not limited to name, type, and address, as well as customer reviews and other third-party content."
@@ -33,81 +34,93 @@ class googlePlaces {
     protected $_pageToken;
     protected $_curloptSslVerifypeer = true; // option CURLOPT_SSL_VERIFYPEER with true value working not always
 
-	/**
-	 * constructor - creates a googlePlaces object with the specified API Key and with proxy if provided
-	 *
-	 * @param       $apiKey - the API Key to use
-	 * @param array $proxy
-	 */
-    public function __construct($apiKey, $proxy = []) {
+    /**
+     * constructor - creates a googlePlaces object with the specified API Key and with proxy if provided
+     *
+     * @param       $apiKey - the API Key to use
+     * @param array $proxy
+     */
+    public function __construct($apiKey, $proxy = [])
+    {
         $this->_apiKey = $apiKey;
         $this->_proxy = $proxy;
     }
 
-    public function autocomplete() {
+    public function autocomplete()
+    {
         $this->_apiCallType = googlePlacesCallType::AUTOCOMPLETE;
         return $this->_executeAPICall();
     }
 
     // for backward compatibility
-    public function search() {
+    public function search()
+    {
         $this->_apiCallType = googlePlacesCallType::SEARCH;
 
         return $this->_executeAPICall();
     }
 
     // hits the v3 API
-    public function nearbySearch() {
+    public function nearbySearch()
+    {
         $this->_apiCallType = googlePlacesCallType::NEARBY_SEARCH;
         return $this->_executeAPICall();
     }
 
     // hits the v3 API
-    public function radarSearch() {
+    public function radarSearch()
+    {
         $this->_apiCallType = googlePlacesCallType::RADAR_SEARCH;
 
         return $this->_executeAPICall();
     }
 
     // hits the v3 API
-	public function textSearch() {
+    public function textSearch()
+    {
         $this->_apiCallType = googlePlacesCallType::TEXT_SEARCH;
 
         return $this->_executeAPICall();
     }
 
-	public function details() {
-		$this->_apiCallType = googlePlacesCallType::DETAILS_SEARCH;
+    public function details()
+    {
+        $this->_apiCallType = googlePlacesCallType::DETAILS_SEARCH;
 
-		return $this->_executeAPICall();
-	}
+        return $this->_executeAPICall();
+    }
 
-	public function checkIn() {
-		$this->_apiCallType = googlePlacesCallType::CHECKIN;
+    public function checkIn()
+    {
+        $this->_apiCallType = googlePlacesCallType::CHECKIN;
 
-		return $this->_executeAPICall();
-	}
+        return $this->_executeAPICall();
+    }
 
-	public function add() {
-		$this->_apiCallType = googlePlacesCallType::ADD;
+    public function add()
+    {
+        $this->_apiCallType = googlePlacesCallType::ADD;
 
-		return $this->_executeAPICall();
-	}
+        return $this->_executeAPICall();
+    }
 
-	public function delete() {
-		$this->_apiCallType = googlePlacesCallType::DELETE;
+    public function delete()
+    {
+        $this->_apiCallType = googlePlacesCallType::DELETE;
 
-		return $this->_executeAPICall();
-	}
+        return $this->_executeAPICall();
+    }
 
-	public function repeat($pageToken) {
-		$this->_apiCallType = googlePlacesCallType::REPEAT;
-		$this->_pageToken = $pageToken;
+    public function repeat($pageToken)
+    {
+        $this->_apiCallType = googlePlacesCallType::REPEAT;
+        $this->_pageToken = $pageToken;
 
-		return $this->_executeAPICall();
-	}
+        return $this->_executeAPICall();
+    }
 
-    public function photo($photoReference, $maxwidth=false, $maxheight=false) {
+    public function photo($photoReference, $maxwidth = false, $maxheight = false)
+    {
         $pixelConstraints = ($maxheight) ? "&maxheight=$maxheight" : "";
         $pixelConstraints .= ($maxwidth) ? "&maxwidth=$maxwidth" : "";
         return $this->_apiUrl . '/photo?key=' . $this->_apiKey . '&photoreference=' . $photoReference . $pixelConstraints;
@@ -122,13 +135,13 @@ class googlePlaces {
     {
         $this->_checkErrors();
 
-        if($this->_apiCallType == googlePlacesCallType::ADD || $this->_apiCallType == googlePlacesCallType::DELETE) {
+        if ($this->_apiCallType == googlePlacesCallType::ADD || $this->_apiCallType == googlePlacesCallType::DELETE) {
             return $this->_executeAddOrDelete();
         }
 
         $urlParameterString = $this->_formatParametersForURL();
 
-        $URLToCall = $this->_apiUrl . '/' . $this->_apiCallType . '/' . $this->_outputType . '?key='.$this->_apiKey . '&' . $urlParameterString;
+        $URLToCall = $this->_apiUrl . '/' . $this->_apiCallType . '/' . $this->_outputType . '?key=' . $this->_apiKey . '&' . $urlParameterString;
 
         $result = json_decode($this->_curlCall($URLToCall), true);
 
@@ -141,19 +154,20 @@ class googlePlaces {
      * _checkErrors - Checks to see if this Google Places request has all of the required fields as far as we know. In the
      * event that it doesn't, it'll populate the _errors array with an error message for each error found.
      */
-	protected function _checkErrors() {
-		if(empty($this->_apiCallType)) {
-			$this->_errors[] = 'API Call Type is required but is missing.';
-		}
+    protected function _checkErrors()
+    {
+        if (empty($this->_apiCallType)) {
+            $this->_errors[] = 'API Call Type is required but is missing.';
+        }
 
-		if(empty($this->_apiKey)) {
-			$this->_errors[] = 'API Key is is required but is missing.';
-		}
+        if (empty($this->_apiKey)) {
+            $this->_errors[] = 'API Key is is required but is missing.';
+        }
 
-		if(($this->_outputType!='json') && ($this->outputType!='xml') && ($this->outputType!='json')) {
-			$this->_errors[] = 'OutputType is required but is missing.';
-		}
-	}
+        if (($this->_outputType != 'json') && ($this->outputType != 'xml') && ($this->outputType != 'json')) {
+            $this->_errors[] = 'OutputType is required but is missing.';
+        }
+    }
 
     /**
      * _executeAddOrDelete - Executes a Google Places add or delete call based on the call type member variable. These are
@@ -161,10 +175,11 @@ class googlePlaces {
      *
      * @return mixed - the Google Places API response for the given call type
      */
-    protected function _executeAddOrDelete() {
+    protected function _executeAddOrDelete()
+    {
         $postUrl = $this->_apiUrl . '/' . $this->_apiCallType . '/' . $this->_outputType . '?key=' . $this->_apiKey . '&sensor=' . $this->_sensor;
 
-        if($this->_apiCallType == googlePlacesCallType::ADD) {
+        if ($this->_apiCallType == googlePlacesCallType::ADD) {
             $locationArray = explode(',', $this->_location);
             $lat = trim($locationArray[0]);
             $lng = trim($locationArray[1]);
@@ -178,11 +193,11 @@ class googlePlaces {
             $postData['language'] = $this->_language;
         }
 
-        if($this->_apiCallType == googlePlacesCallType::DELETE) {
+        if ($this->_apiCallType == googlePlacesCallType::DELETE) {
             $postData['placeid'] = $this->_placeId;
         }
 
-        $result = json_decode($this->_curlCall($postUrl,json_encode($postData)));
+        $result = json_decode($this->_curlCall($postUrl, json_encode($postData)));
         $result->errors = $this->_errors;
         return $result;
     }
@@ -193,13 +208,14 @@ class googlePlaces {
      * @param mixed $result - the Google Places result array
      * @return mixed - the formatted Google Places result array
      */
-    protected function _formatResults($result) {
+    protected function _formatResults($result)
+    {
         $formattedResults = array();
         $formattedResults['errors'] = $this->_errors;
 
-		if (isset($result['error_message'])) {
-			$formattedResults['errors'][] = $result['error_message'];
-		}
+        if (isset($result['error_message'])) {
+            $formattedResults['errors'][] = $result['error_message'];
+        }
 
         switch ($this->_apiCallType) {
             case(googlePlacesCallType::AUTOCOMPLETE):
@@ -215,40 +231,40 @@ class googlePlaces {
                     $resultColumnName = 'results';
                 }
 
-                if(isset($result['status']) && $result['status'] == self::OK_STATUS && isset($result[$resultColumnName]['address_components'])) {
+                if (isset($result['status']) && $result['status'] == self::OK_STATUS && isset($result[$resultColumnName]['address_components'])) {
 
                     $formattedResults['result'] = $result[$resultColumnName];
 
-                    $address_premise='';
-                    $address_street_number='';
-                    $address_street_name='';
-                    $address_city='';
-                    $address_state='';
-                    $address_postal_code='';
+                    $address_premise = '';
+                    $address_street_number = '';
+                    $address_street_name = '';
+                    $address_city = '';
+                    $address_state = '';
+                    $address_postal_code = '';
 
-                    foreach($result[$resultColumnName]['address_components'] as $key => $component) {
+                    foreach ($result[$resultColumnName]['address_components'] as $key => $component) {
 
-                        if($component['types'] && $component['types'][0]=='premise') {
+                        if ($component['types'] && $component['types'][0] == 'premise') {
                             $address_premise = $component['short_name'];
                         }
 
-                        if($component['types'] && $component['types'][0]=='street_number') {
+                        if ($component['types'] && $component['types'][0] == 'street_number') {
                             $address_street_number = $component['short_name'];
                         }
 
-                        if($component['types'] && $component['types'][0]=='route') {
+                        if ($component['types'] && $component['types'][0] == 'route') {
                             $address_street_name = $component['short_name'];
                         }
 
-                        if($component['types'] && $component['types'][0]=='locality') {
+                        if ($component['types'] && $component['types'][0] == 'locality') {
                             $address_city = $component['short_name'];
                         }
 
-                        if($component['types'] && $component['types'][0]=='administrative_area_level_1') {
+                        if ($component['types'] && $component['types'][0] == 'administrative_area_level_1') {
                             $address_state = $component['short_name'];
                         }
 
-                        if($component['types'] && $component['types'][0]=='postal_code') {
+                        if ($component['types'] && $component['types'][0] == 'postal_code') {
                             $address_postal_code = $component['short_name'];
                         }
                     }
@@ -261,7 +277,7 @@ class googlePlaces {
                     $formattedResults['result']['address_fixed']['address_postal_code'] = $address_postal_code;
                 }
 
-                if ( isset( $result['next_page_token'] ) ) {
+                if (isset($result['next_page_token'])) {
                     $formattedResults['next_page_token'] = $result['next_page_token'];
                 }
 
@@ -275,9 +291,10 @@ class googlePlaces {
      *
      * @return string - the formatted parameter request string based on the call type
      */
-    protected function _formatParametersForURL() {
+    protected function _formatParametersForURL()
+    {
 
-       $parameterString = '';
+        $parameterString = '';
 
         switch ($this->_apiCallType) {
             case(googlePlacesCallType::SEARCH):
@@ -308,7 +325,7 @@ class googlePlaces {
                 break;
 
             case(googlePlacesCallType::REPEAT):
-                $parameterString = 'radius='.$this->_radius . '&sensor=' . $this->_sensor . '&pagetoken=' . $this->_pageToken;
+                $parameterString = 'radius=' . $this->_radius . '&sensor=' . $this->_sensor . '&pagetoken=' . $this->_pageToken;
                 $this->_apiCallType = 'search';
                 break;
 
@@ -322,18 +339,19 @@ class googlePlaces {
     }
 
     /**
-    * Controls the use of incompatable parameters when constructing a URL
-    *
-    * i.e ranking the results by distance requires a keyword, name or types parameter to be defined but it cannot be used in conjunction with a search radius
-    *
-    * @param string $parameterString
-    * @return string $parameterString
-    */
-    protected function _urlDependencies($parameterString) {
+     * Controls the use of incompatable parameters when constructing a URL
+     *
+     * i.e ranking the results by distance requires a keyword, name or types parameter to be defined but it cannot be used in conjunction with a search radius
+     *
+     * @param string $parameterString
+     * @return string $parameterString
+     */
+    protected function _urlDependencies($parameterString)
+    {
         if (($this->_rankBy == 'distance') && ((!empty($this->_types)) || (!empty($this->_name)) || (!empty($this->_keyword)))) {
-            $parameterString .= '&name=' . $this->_name . '&keyword=' . $this->_keyword. '&types=' . urlencode($this->_types) . '&rankby=' . $this->_rankBy;
+            $parameterString .= '&name=' . $this->_name . '&keyword=' . $this->_keyword . '&types=' . urlencode($this->_types) . '&rankby=' . $this->_rankBy;
         } else {
-            $parameterString .= '&name=' . $this->_name . '&keyword=' . $this->_keyword. '&types=' . urlencode($this->_types) . '&radius='.$this->_radius;
+            $parameterString .= '&name=' . $this->_name . '&keyword=' . $this->_keyword . '&types=' . urlencode($this->_types) . '&radius=' . $this->_radius;
         }
 
         return $parameterString;
@@ -347,91 +365,103 @@ class googlePlaces {
      * @param array $topost - the data to post in the curl call (if any)
      * @return mixed - the response payload of the call
      */
-	protected function _curlCall($url, $topost = array())
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_HEADER, FALSE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->_curloptSslVerifypeer);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		if (!empty($topost)) {
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $topost);
-		}
+    protected function _curlCall($url, $topost = array())
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HEADER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->_curloptSslVerifypeer);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        if (!empty($topost)) {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $topost);
+        }
 
-		if ($this->_proxy) {
-			$this->setCurlProxy($ch);
-		}
+        if ($this->_proxy) {
+            $this->setCurlProxy($ch);
+        }
 
-		$body = curl_exec($ch);
-		curl_close($ch);
+        $body = curl_exec($ch);
+        curl_close($ch);
 
-		return $body;
-	}
+        return $body;
+    }
 
-	/**
-	 * Adds proxy to cUrl
-	 * @param $ch
-	 */
-	protected function setCurlProxy($ch) {
-		$url = $this->_proxy["host"].(!empty($this->_proxy["port"]) ? ':'.$this->_proxy["port"] : '');
-		curl_setopt($ch, CURLOPT_PROXY, $url);
+    /**
+     * Adds proxy to cUrl
+     * @param $ch
+     */
+    protected function setCurlProxy($ch)
+    {
+        $url = $this->_proxy["host"] . (!empty($this->_proxy["port"]) ? ':' . $this->_proxy["port"] : '');
+        curl_setopt($ch, CURLOPT_PROXY, $url);
 
-		if (!empty($this->_proxy["username"]) && !empty($this->_proxy["password"])) {
-			curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->_proxy["username"].":".$this->_proxy["password"]);
-		}
-	}
-
+        if (!empty($this->_proxy["username"]) && !empty($this->_proxy["password"])) {
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->_proxy["username"] . ":" . $this->_proxy["password"]);
+        }
+    }
 
 
     /***********************
      * Getters and Setters *
      ***********************/
 
-    public function setLocation($location) {
+    public function setLocation($location)
+    {
         $this->_location = $location;
     }
 
-    public function setQuery($query) {
+    public function setQuery($query)
+    {
         $this->_query = preg_replace('/\s/', '+', $query);
     }
 
-    public function setRadius($radius) {
+    public function setRadius($radius)
+    {
         $this->_radius = $radius;
     }
 
-    public function setTypes($types) {
+    public function setTypes($types)
+    {
         $this->_types = $types;
     }
 
-    public function setLanguage($language) {
+    public function setLanguage($language)
+    {
         $this->_language = $language;
     }
 
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->_name = $name;
     }
 
-    public function setKeyword($keyword) {
+    public function setKeyword($keyword)
+    {
         $this->_keyword = $keyword;
     }
 
-    public function setSensor($sensor) {
+    public function setSensor($sensor)
+    {
         $this->_sensor = $sensor;
     }
 
-    public function setPlaceId($placeId) {
+    public function setPlaceId($placeId)
+    {
         $this->_placeId = $placeId;
     }
 
-    public function setAccuracy($accuracy) {
+    public function setAccuracy($accuracy)
+    {
         $this->_accuracy = $accuracy;
     }
 
-    public function setIncludeDetails($includeDetails) {
+    public function setIncludeDetails($includeDetails)
+    {
         $this->_includeDetails = $includeDetails;
     }
 
-    public function setRankBy($rankBy) {
+    public function setRankBy($rankBy)
+    {
         $rankBy = strtolower($rankBy);
 
         if (($rankBy == 'prominence') || ($rankBy = 'distance')) {
@@ -439,12 +469,14 @@ class googlePlaces {
         }
     }
 
-    public function setCurloptSslVerifypeer($curloptSslVerifypeer) {
+    public function setCurloptSslVerifypeer($curloptSslVerifypeer)
+    {
         $this->_curloptSslVerifypeer = $curloptSslVerifypeer;
     }
 }
 
-class googlePlacesCallType{
+class googlePlacesCallType
+{
     const SEARCH = 'search';
     const AUTOCOMPLETE = 'autocomplete';
     const NEARBY_SEARCH = 'nearbysearch';
