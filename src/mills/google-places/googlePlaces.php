@@ -44,6 +44,11 @@ class googlePlaces {
         $this->_proxy = $proxy;
     }
 
+    public function autocomplete() {
+        $this->_apiCallType = googlePlacesCallType::AUTOCOMPLETE;
+        return $this->_executeAPICall();
+    }
+
     // for backward compatibility
     public function search() {
         $this->_apiCallType = googlePlacesCallType::SEARCH;
@@ -196,62 +201,72 @@ class googlePlaces {
 			$formattedResults['errors'][] = $result['error_message'];
 		}
 
-		// for backward compatibility
-		$resultColumnName = 'result';
-		if (!isset($result[$resultColumnName])) {
-			$resultColumnName = 'results';
-		}
+        switch ($this->_apiCallType) {
+            case(googlePlacesCallType::AUTOCOMPLETE):
+                if (isset($result['predictions'])) {
+                    $formattedResults['predictions'] = $result['predictions'];
+                }
+                break;
+            default:
 
-        if(isset($result['status']) && $result['status'] == self::OK_STATUS && isset($result[$resultColumnName]['address_components'])) {
-
-			$formattedResults['result'] = $result[$resultColumnName];
-
-            $address_premise='';
-            $address_street_number='';
-            $address_street_name='';
-            $address_city='';
-            $address_state='';
-            $address_postal_code='';
-
-            foreach($result[$resultColumnName]['address_components'] as $key => $component) {
-
-                if($component['types'] && $component['types'][0]=='premise') {
-					$address_premise = $component['short_name'];
+                // for backward compatibility
+                $resultColumnName = 'result';
+                if (!isset($result[$resultColumnName])) {
+                    $resultColumnName = 'results';
                 }
 
-                if($component['types'] && $component['types'][0]=='street_number') {
-                    $address_street_number = $component['short_name'];
+                if(isset($result['status']) && $result['status'] == self::OK_STATUS && isset($result[$resultColumnName]['address_components'])) {
+
+                    $formattedResults['result'] = $result[$resultColumnName];
+
+                    $address_premise='';
+                    $address_street_number='';
+                    $address_street_name='';
+                    $address_city='';
+                    $address_state='';
+                    $address_postal_code='';
+
+                    foreach($result[$resultColumnName]['address_components'] as $key => $component) {
+
+                        if($component['types'] && $component['types'][0]=='premise') {
+                            $address_premise = $component['short_name'];
+                        }
+
+                        if($component['types'] && $component['types'][0]=='street_number') {
+                            $address_street_number = $component['short_name'];
+                        }
+
+                        if($component['types'] && $component['types'][0]=='route') {
+                            $address_street_name = $component['short_name'];
+                        }
+
+                        if($component['types'] && $component['types'][0]=='locality') {
+                            $address_city = $component['short_name'];
+                        }
+
+                        if($component['types'] && $component['types'][0]=='administrative_area_level_1') {
+                            $address_state = $component['short_name'];
+                        }
+
+                        if($component['types'] && $component['types'][0]=='postal_code') {
+                            $address_postal_code = $component['short_name'];
+                        }
+                    }
+
+                    $formattedResults['result']['address_fixed']['premise'] = $address_premise;
+                    $formattedResults['result']['address_fixed']['street_number'] = $address_street_number;
+                    $formattedResults['result']['address_fixed']['address_street_name'] = $address_street_name;
+                    $formattedResults['result']['address_fixed']['address_city'] = $address_city;
+                    $formattedResults['result']['address_fixed']['address_state'] = $address_state;
+                    $formattedResults['result']['address_fixed']['address_postal_code'] = $address_postal_code;
                 }
 
-                if($component['types'] && $component['types'][0]=='route') {
-                    $address_street_name = $component['short_name'];
+                if ( isset( $result['next_page_token'] ) ) {
+                    $formattedResults['next_page_token'] = $result['next_page_token'];
                 }
 
-                if($component['types'] && $component['types'][0]=='locality') {
-                    $address_city = $component['short_name'];
-                }
-
-                if($component['types'] && $component['types'][0]=='administrative_area_level_1') {
-                    $address_state = $component['short_name'];
-                }
-
-                if($component['types'] && $component['types'][0]=='postal_code') {
-                    $address_postal_code = $component['short_name'];
-                }
-            }
-
-            $formattedResults['result']['address_fixed']['premise'] = $address_premise;
-            $formattedResults['result']['address_fixed']['street_number'] = $address_street_number;
-            $formattedResults['result']['address_fixed']['address_street_name'] = $address_street_name;
-            $formattedResults['result']['address_fixed']['address_city'] = $address_city;
-            $formattedResults['result']['address_fixed']['address_state'] = $address_state;
-            $formattedResults['result']['address_fixed']['address_postal_code'] = $address_postal_code;
+                break;
         }
-
-        if ( isset( $result['next_page_token'] ) ) {
-            $formattedResults['next_page_token'] = $result['next_page_token'];
-        }
-
         return $formattedResults;
     }
 
@@ -295,6 +310,10 @@ class googlePlaces {
             case(googlePlacesCallType::REPEAT):
                 $parameterString = 'radius='.$this->_radius . '&sensor=' . $this->_sensor . '&pagetoken=' . $this->_pageToken;
                 $this->_apiCallType = 'search';
+                break;
+
+            case(googlePlacesCallType::AUTOCOMPLETE):
+                $parameterString = 'input=' . $this->_query;
                 break;
         }
 
@@ -427,6 +446,7 @@ class googlePlaces {
 
 class googlePlacesCallType{
     const SEARCH = 'search';
+    const AUTOCOMPLETE = 'autocomplete';
     const NEARBY_SEARCH = 'nearbysearch';
     const RADAR_SEARCH = 'radarsearch';
     const TEXT_SEARCH = 'textsearch';
