@@ -244,11 +244,10 @@ class googlePlaces
                     $address_postal_code = '';
 
                     foreach ($result[$resultColumnName] as $component) {
-                        $component=$component[0];
-
-                        if (!isset($component['types'])) {
+                        if (!isset($component[0]['types'])) {
                             continue;
                         }
+                        $component=$component[0];
 
                         if ($component['types'] && $component['types'][0] == 'premise') {
                             $address_premise = $component['short_name'];
