@@ -231,7 +231,8 @@ class googlePlaces
                     $resultColumnName = 'results';
                 }
 
-                if (isset($result['status']) && $result['status'] == self::OK_STATUS && isset($result[$resultColumnName]['address_components'])) {
+                if (isset($result['status']) && $result['status'] == self::OK_STATUS &&
+                    isset($result[$resultColumnName])) {
 
                     $formattedResults['result'] = $result[$resultColumnName];
 
@@ -242,7 +243,11 @@ class googlePlaces
                     $address_state = '';
                     $address_postal_code = '';
 
-                    foreach ($result[$resultColumnName]['address_components'] as $key => $component) {
+                    foreach ($result[$resultColumnName] as $component) {
+                        if (!isset($component[0]['types'])) {
+                            continue;
+                        }
+                        $component=$component[0];
 
                         if ($component['types'] && $component['types'][0] == 'premise') {
                             $address_premise = $component['short_name'];
