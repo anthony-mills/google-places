@@ -31,6 +31,7 @@ class googleGeocoding {
     protected $_region;             // The region code, specified as a ccTLD ("top-level domain") two-character value. This parameter will only influence, not fully restrict, results from the geocoder. (For more information see Region Biasing below.)
 
     protected $_curloptSslVerifypeer = true; // option CURLOPT_SSL_VERIFYPEER with true value working not always
+	protected $_curlReferer;
 
     /**
      * constructor - creates a googleGeocoding object with the specified API Key
@@ -160,6 +161,7 @@ class googleGeocoding {
         curl_setopt($ch, CURLOPT_HEADER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->_curloptSslVerifypeer);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		if ($this->_curlReferer) curl_setopt($ch, CURLOPT_REFERER, $this->_curlReferer);
 
         if (!empty($dataToPost)) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $dataToPost);
@@ -176,6 +178,10 @@ class googleGeocoding {
     /***********************
      * Getters and Setters *
      ***********************/
+
+    public function setCurlReferer($referer) {
+        $this->_curlReferer = $referer;
+    }
 
     public function setAddress($address) {
         $this->_address = urlencode($address);
