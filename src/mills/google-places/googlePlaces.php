@@ -33,6 +33,7 @@ class googlePlaces
     protected $_accuracy;
     protected $_pageToken;
     protected $_curloptSslVerifypeer = true; // option CURLOPT_SSL_VERIFYPEER with true value working not always
+	protected $_curlReferer;
 
     /**
      * constructor - creates a googlePlaces object with the specified API Key and with proxy if provided
@@ -377,6 +378,8 @@ class googlePlaces
         curl_setopt($ch, CURLOPT_HEADER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->_curloptSslVerifypeer);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		if ($this->_curlReferer) curl_setopt($ch, CURLOPT_REFERER, $this->_curlReferer);
+		
         if (!empty($topost)) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $topost);
         }
@@ -410,8 +413,11 @@ class googlePlaces
      * Getters and Setters *
      ***********************/
 
-    public function setLocation($location)
-    {
+ 	public function setCurlReferer($referer) {
+        $this->_curlReferer = $referer;
+    }
+
+    public function setLocation($location) {
         $this->_location = $location;
     }
 
