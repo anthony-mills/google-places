@@ -161,7 +161,10 @@ class googleGeocoding {
         curl_setopt($ch, CURLOPT_HEADER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->_curloptSslVerifypeer);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		if ($this->_curlReferer) curl_setopt($ch, CURLOPT_REFERER, $this->_curlReferer);
+        
+		if ($this->_curlReferer) {
+            curl_setopt($ch, CURLOPT_REFERER, $this->_curlReferer);
+        }
 
         if (!empty($dataToPost)) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $dataToPost);
