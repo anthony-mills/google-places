@@ -165,7 +165,7 @@ class googlePlaces
             $this->_errors[] = 'API Key is is required but is missing.';
         }
 
-        if (($this->_outputType != 'json') && ($this->outputType != 'xml') && ($this->outputType != 'json')) {
+        if (($this->_outputType != 'json') || ($this->outputType != 'xml') || ($this->outputType != 'array')) {
             $this->_errors[] = 'OutputType is required but is missing.';
         }
     }
