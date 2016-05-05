@@ -336,7 +336,7 @@ class googlePlaces
                 break;
 
             case(googlePlacesCallType::AUTOCOMPLETE):
-                $parameterString = 'input=' . $this->_query;
+                $parameterString = 'input=' . $this->_query . '&language=' . $this->_language;
                 break;
         }
 
