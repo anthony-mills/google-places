@@ -426,7 +426,7 @@ class googlePlaces
 
     public function setQuery($query)
     {
-        $this->_query = preg_replace('/\s/', '+', $query);
+        $this->_query = urlencode($query);
     }
 
     public function setRadius($radius)
