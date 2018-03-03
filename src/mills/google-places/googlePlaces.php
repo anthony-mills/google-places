@@ -217,6 +217,9 @@ class googlePlaces
         if (isset($result['error_message'])) {
             $formattedResults['errors'][] = $result['error_message'];
         }
+        if (isset($result['status'])) {
+            $formattedResults['status'] = $result['status'];
+        }
 
         switch ($this->_apiCallType) {
             case(googlePlacesCallType::AUTOCOMPLETE):
