@@ -217,6 +217,9 @@ class googlePlaces
         if (isset($result['error_message'])) {
             $formattedResults['errors'][] = $result['error_message'];
         }
+        if (isset($result['status'])) {
+            $formattedResults['status'] = $result['status'];
+        }
 
         switch ($this->_apiCallType) {
             case(googlePlacesCallType::AUTOCOMPLETE):
@@ -242,6 +245,7 @@ class googlePlaces
                     $address_street_name = '';
                     $address_city = '';
                     $address_state = '';
+                    $address_country = '';
                     $address_postal_code = '';
 
                     foreach ($result[$resultColumnName] as $component) {
@@ -270,6 +274,10 @@ class googlePlaces
                             $address_state = $component['short_name'];
                         }
 
+                        if ($component['types'] && $component['types'][0] == 'country') {
+                            $address_country = $component['short_name'];
+                        }
+
                         if ($component['types'] && $component['types'][0] == 'postal_code') {
                             $address_postal_code = $component['short_name'];
                         }
@@ -280,6 +288,7 @@ class googlePlaces
                     $formattedResults['result']['address_fixed']['address_street_name'] = $address_street_name;
                     $formattedResults['result']['address_fixed']['address_city'] = $address_city;
                     $formattedResults['result']['address_fixed']['address_state'] = $address_state;
+                    $formattedResults['result']['address_fixed']['address_country'] = $address_country;
                     $formattedResults['result']['address_fixed']['address_postal_code'] = $address_postal_code;
                 }
 
